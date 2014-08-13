@@ -1,23 +1,20 @@
-Code.ensure_loaded?(Hex) and Hex.start
-
 defmodule Postgrex.Mixfile do
   use Mix.Project
 
   def project do
-    [ app: :postgrex,
-      version: "0.5.2-dev",
-      elixir: "== 0.13.3 or ~> 0.14.0-dev",
-      deps: deps,
-      build_per_environment: false,
-      name: "Postgrex",
-      source_url: "https://github.com/ericmj/postgrex",
-      docs: fn -> [
-        source_ref: System.cmd("git rev-parse --verify --quiet HEAD"),
-        main: "README",
-        readme: true ]
-      end,
-      description: description,
-      package: package ]
+    [app: :postgrex,
+     version: "0.5.5-dev",
+     elixir: "~> 0.15.0",
+     deps: deps,
+     build_per_environment: false,
+     name: "Postgrex",
+     source_url: "https://github.com/ericmj/postgrex",
+     docs: fn ->
+       {ref, 0} = System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"])
+       [source_ref: ref, main: "README", readme: true]
+     end,
+     description: description,
+     package: package]
   end
 
   # Configuration for the OTP application
@@ -26,9 +23,9 @@ defmodule Postgrex.Mixfile do
   end
 
   defp deps do
-    [ { :ex_doc, github: "elixir-lang/ex_doc", only: :docs },
-      { :decimal, github: "ericmj/decimal" } ]
-    # { :decimal, "~> 0.2.1" } ]
+    [{:ex_doc, github: "elixir-lang/ex_doc", only: :dev},
+     {:markdown, github: "devinus/markdown", only: :dev},
+     {:decimal, "~> 0.2.3"}]
   end
 
   defp description do
@@ -38,9 +35,9 @@ defmodule Postgrex.Mixfile do
   end
 
   defp package do
-    [ contributors: ["Eric Meadows-Jönsson"],
-      licenses: ["Apache 2.0"],
-      links: %{"Github" => "https://github.com/ericmj/postgrex",
-               "Documentation" => "http://ericmj.github.io/postgrex"} ]
+    [contributors: ["Eric Meadows-Jönsson"],
+     licenses: ["Apache 2.0"],
+     links: %{"Github" => "https://github.com/ericmj/postgrex",
+              "Documentation" => "http://ericmj.github.io/postgrex"}]
   end
 end

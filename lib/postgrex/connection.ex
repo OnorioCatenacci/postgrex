@@ -22,7 +22,7 @@ defmodule Postgrex.Connection do
     * `:port` - Server port (default: 5432);
     * `:database` - Database (required);
     * `:username` - Username (default: PGUSER env variable, then USER env var);
-    * `:password` - User password;
+    * `:password` - User password (default PGPASSWORD);
     * `:encoder` - Custom encoder function;
     * `:decoder` - Custom decoder function;
     * `:formatter` - Function deciding the format for a type;
@@ -81,7 +81,7 @@ defmodule Postgrex.Connection do
   def query(pid, statement, params \\ [], timeout \\ @timeout) do
     case :gen_server.call(pid, {{:query, statement, params}, timeout}, timeout) do
       %Postgrex.Result{} = res -> {:ok, res}
-      %Postgrex.Error{} = err -> {:error, err}
+      %Postgrex.Error{} = err  -> {:error, err}
     end
   end
 
@@ -95,7 +95,7 @@ defmodule Postgrex.Connection do
   def query!(pid, statement, params \\ [], timeout \\ @timeout) do
     case :gen_server.call(pid, {{:query, statement, params}, timeout}, timeout) do
       %Postgrex.Result{} = res -> res
-      %Postgrex.Error{} = err -> raise err
+      %Postgrex.Error{} = err  -> raise err
     end
   end
 
@@ -136,7 +136,7 @@ defmodule Postgrex.Connection do
   def begin(pid, timeout \\ @timeout) do
     case :gen_server.call(pid, {:begin, timeout}, timeout) do
       %Postgrex.Result{} -> :ok
-      %Postgrex.Error{} = err -> err
+      %Postgrex.Error{} = err -> {:error, err}
     end
   end
 
@@ -163,7 +163,7 @@ defmodule Postgrex.Connection do
     case :gen_server.call(pid, {:rollback, timeout}, timeout) do
       :ok -> :ok
       %Postgrex.Result{} -> :ok
-      %Postgrex.Error{} = err -> err
+      %Postgrex.Error{} = err -> {:error, err}
     end
   end
 
@@ -191,7 +191,7 @@ defmodule Postgrex.Connection do
     case :gen_server.call(pid, {:commit, timeout}, timeout) do
       :ok -> :ok
       %Postgrex.Result{} -> :ok
-      %Postgrex.Error{} = err -> err
+      %Postgrex.Error{} = err -> {:error, err}
     end
   end
 
@@ -241,7 +241,7 @@ defmodule Postgrex.Connection do
               err -> raise err
             end
           type, term ->
-            rollback(pid, timeout)
+            _ = rollback(pid, timeout)
             :erlang.raise(type, term, System.stacktrace)
         end
       err -> raise err
@@ -337,7 +337,7 @@ defmodule Postgrex.Connection do
 
   def handle_info({:tcp, _, data}, %{sock: {:gen_tcp, sock}, opts: opts, state: :ssl} = s) do
     case data do
-      << ?S >> ->
+      <<?S>> ->
         case :ssl.connect(sock, opts[:ssl_opts] || []) do
           {:ok, ssl_sock} ->
             :ssl.setopts(ssl_sock, active: :once)
@@ -347,7 +347,7 @@ defmodule Postgrex.Connection do
             {:stop, :normal, s}
         end
 
-      << ?N >> ->
+      <<?N>> ->
         reply(%Postgrex.Error{message: "ssl not available"}, s)
         {:stop, :normal, s}
     end
@@ -442,11 +442,11 @@ defmodule Postgrex.Connection do
     end
   end
 
-  defp new_data(<< type :: int8, size :: int32, data :: binary >> = tail, %{state: state} = s) do
+  defp new_data(<<type :: int8, size :: int32, data :: binary>> = tail, %{state: state} = s) do
     size = size - 4
 
     case data do
-      << data :: binary(size), tail :: binary >> ->
+      <<data :: binary(size), tail :: binary>> ->
         msg = Protocol.parse(type, size, data)
         case message(state, msg, s) do
           {:ok, s} -> new_data(tail, s)
@@ -476,8 +476,10 @@ defmodule Postgrex.Connection do
   end
 
   defp message(:auth, msg_auth(type: :md5, data: salt), %{opts: opts} = s) do
-    digest = :crypto.hash(:md5, [opts[:password], opts[:username]]) |> hexify
-    digest = :crypto.hash(:md5, [digest, salt]) |> hexify
+    digest = :crypto.hash(:md5, [opts[:password], opts[:username]])
+             |> Base.encode16(case: :lower)
+    digest = :crypto.hash(:md5, [digest, salt])
+             |> Base.encode16(case: :lower)
     msg = msg_password(pass: ["md5", digest])
     send_to_result(msg, s)
   end
@@ -523,7 +525,7 @@ defmodule Postgrex.Connection do
     rfs = []
     if not bootstrap do
       {info, rfs, cols} = extract_row_info(fields, types, opts[:decoder], opts[:formatter])
-      stat = %{columns: cols, row_info: list_to_tuple(info)}
+      stat = %{columns: cols, row_info: List.to_tuple(info)}
       s = %{s | statement: stat}
     end
 
@@ -664,7 +666,7 @@ defmodule Postgrex.Connection do
           {count + 1, [decoded|list]}
       end)
 
-      row = Enum.reverse(row) |> list_to_tuple
+      row = Enum.reverse(row) |> List.to_tuple
       [ row | acc ]
     end)
   end
@@ -723,7 +725,7 @@ defmodule Postgrex.Connection do
         end
 
       {{info, format, default}, format, name}
-    end) |> List.unzip |> list_to_tuple
+    end) |> List.unzip |> List.to_tuple
   end
 
   defp create_result(tag) do
@@ -752,20 +754,20 @@ defmodule Postgrex.Connection do
     end)
 
     {command, nums} = Enum.split_while(words, &is_binary(&1))
-    command = Enum.join(command, "_") |> String.downcase |> binary_to_atom
+    command = Enum.join(command, "_") |> String.downcase |> String.to_atom
     {command, List.last(nums)}
   end
 
   defp msg_send(msg, %{sock: sock}), do: msg_send(msg, sock)
 
   defp msg_send(msgs, {mod, sock}) when is_list(msgs) do
-    binaries = Enum.map(msgs, &Protocol.msg_to_binary(&1))
+    binaries = Enum.reduce(msgs, [], &[&2 | Protocol.encode_msg(&1)])
     mod.send(sock, binaries)
   end
 
   defp msg_send(msg, {mod, sock}) do
-    binary = Protocol.msg_to_binary(msg)
-    mod.send(sock, binary)
+    data = Protocol.encode_msg(msg)
+    mod.send(sock, data)
   end
 
   defp send_to_result(msg, s) do
@@ -776,13 +778,4 @@ defmodule Postgrex.Connection do
         {:error, %Postgrex.Error{message: "tcp send: #{reason}"} , s}
     end
   end
-
-  defp hexify(bin) do
-    for << high :: size(4), low :: size(4) <- bin >>, into: "" do
-      << hex_char(high), hex_char(low) >>
-    end
-  end
-
-  defp hex_char(n) when n < 10, do: ?0 + n
-  defp hex_char(n) when n < 16, do: ?a - 10 + n
 end
