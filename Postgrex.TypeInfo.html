@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Postgrex.TypeInfo</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <div id="content">
+      <div class="breadcrumbs">Postgrex v0.5.3 &rarr; <a href="overview.html">Overview</a> &rarr; Postgrex &rarr; <a href="Postgrex.TypeInfo.html">TypeInfo</a></div>
+
+      <h1>
+        Postgrex.TypeInfo
+        
+      </h1>
+
+      <ul class="summary_links">
+        
+        
+        
+        
+        
+          <li><a href="#types_details">Types</a></li>
+        
+      </ul>
+
+      
+        <div id="moduledoc" class="docstring">
+          <p>The information about a type that is provided to the custom encoder/decoder
+functions.</p>
+
+<ul>
+<li><code>oid</code> - The type&#39;s <a href="http://www.postgresql.org/docs/9.3/static/datatype-oid.html">oid</a>;</li>
+<li><code>sender</code> - The name of the &quot;sender&quot; function (the function postgres uses
+to convert the type to binary format) without the &quot;send&quot; postfix. Useful
+to identify types that share a common binary format by a common name;</li>
+<li><code>type</code> - The type name;</li>
+<li><code>array_elem</code> - If the type is an array, the array elements&#39; oid;</li>
+<li><code>comp_elems</code> - If the type is a composite type (record), the tuple
+elements&#39; oid;</li>
+</ul>
+
+        </div>
+      
+
+      
+        <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/structs.ex#L23" class="view_source">Source</a>
+      
+
+      
+
+      
+        <div id="types_details" class="details_list">
+          <h2>Types <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></h2>
+          <div class="type_detail">
+  <p class="typespec" id="t:t/0">
+    <a href="#t:t/0">t</a> :: %Postgrex.TypeInfo{oid: pos_integer, sender: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, type: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, array_elem: pos_integer, comp_elems: [pos_integer]}
+  </p>
+  
+</div>
+
+        </div>
+      
+
+      
+
+      
+
+      
+    </div>
+  </body>
+</html>

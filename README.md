@@ -12,7 +12,7 @@ Add Postgrex as a dependency in your `mix.exs` file.
 
 ```elixir
 def deps do
-  [ { :postgrex, "~> 0.5" } ]
+  [ { :postgrex, github: "ericmj/postgrex" } ]
 end
 ```
 

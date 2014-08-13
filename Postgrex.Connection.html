@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Postgrex.Connection</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <div id="content">
+      <div class="breadcrumbs">Postgrex v0.5.3 &rarr; <a href="overview.html">Overview</a> &rarr; Postgrex &rarr; <a href="Postgrex.Connection.html">Connection</a></div>
+
+      <h1>
+        Postgrex.Connection
+        
+      </h1>
+
+      <ul class="summary_links">
+        
+          <li><a href="#summary">Summary</a></li>
+        
+        
+          <li><a href="#functions_details">Functions</a></li>
+        
+        
+        
+        
+      </ul>
+
+      
+        <div id="moduledoc" class="docstring">
+          <p>Main API for Postgrex. This module handles the connection to postgres.</p>
+
+        </div>
+      
+
+      
+        <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L1" class="view_source">Source</a>
+      
+
+      
+        <h2 id="summary">Summary<div class="detail_header_links"><a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></div></h2>
+        <table class="summary">
+          <tr>
+  <td class="summary_signature"><a href="#begin!/2">begin!(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Starts a transaction. Returns <code>:ok</code> if it was successful or raises
+<a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if an error occurred. See <code>begin/1</code></p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#begin/2">begin(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Starts a transaction. Returns <code>:ok</code> or <code>{:error, %Postgrex.Error{}}</code> if an
+error occurred. Transactions can be nested with the help of savepoints. A
+transaction won&#39;t end until a <code>rollback/1</code> or <code>commit/1</code> have been issued for
+every <code>begin/1</code></p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#commit!/2">commit!(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Commits a transaction. Returns <code>:ok</code> if it was successful or raises
+<a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if an error occurred. See <code>commit/1</code></p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#commit/2">commit(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Commits a transaction. Returns <code>:ok</code> or <code>{:error, %Postgrex.Error{}}</code> if an
+error occurred. See <code>begin/1</code> for more information</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#in_transaction/3">in_transaction(pid, timeout \\ :infinity, fun)</a></td>
+  
+    <td class="summary_synopsis"><p>Helper for creating reliable transactions. If an error is raised in the given
+function the transaction is rolled back, otherwise it is commited. A
+transaction can be cancelled with <code>throw :postgrex_rollback</code>. If there is a
+connection error <a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> will be raised</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#parameters/2">parameters(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Returns a cached map of connection parameters</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#query!/4">query!(pid, statement, params \\ [], timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Runs an (extended) query and returns the result or raises <a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if
+there was an error. See <code>query/3</code></p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#query/4">query(pid, statement, params \\ [], timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Runs an (extended) query and returns the result as <code>{:ok, %Postgrex.Result{}}</code>
+or <code>{:error, %Postgrex.Error{}}</code> if there was an error. Parameters can be
+set in the query as <code>$1</code> embedded in the query string. Parameters are given as
+a list of elixir values. See the README for information on how Postgrex
+encodes and decodes elixir values by default. See <a href="Postgrex.Result.html"><code>Postgrex.Result</code></a> for the
+result data</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#rollback!/2">rollback!(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Rolls back a transaction. Returns <code>:ok</code> if it was successful or raises
+<a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if an error occurred. See <code>rollback/1</code></p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#rollback/2">rollback(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Rolls back a transaction. Returns <code>:ok</code> or <code>{:error, %Postgrex.Error{}}</code> if
+an error occurred. See <code>begin/1</code> for more information</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#start_link/1">start_link(opts)</a></td>
+  
+    <td class="summary_synopsis"><p>Start the connection process and connect to postgres</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#stop/2">stop(pid, timeout \\ :infinity)</a></td>
+  
+    <td class="summary_synopsis"><p>Stop the process and disconnect</p>
+</td>
+  
+</tr>
+
+        </table>
+      
+
+      
+
+      
+        <div id="functions_details" class="details_list">
+          <h2>Functions</h2>
+          <div class="detail">
+  <div class="detail_header" id="begin/2">
+    <span class="signature"><strong>begin(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#begin/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>begin(pid, timeout) :: :ok | {:error, <a href="Postgrex.Error.html#t:t/0">Postgrex.Error.t</a>}</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Starts a transaction. Returns <code>:ok</code> or <code>{:error, %Postgrex.Error{}}</code> if an
+error occurred. Transactions can be nested with the help of savepoints. A
+transaction won&#39;t end until a <code>rollback/1</code> or <code>commit/1</code> have been issued for
+every <code>begin/1</code>.</p>
+
+<h2>Example</h2>
+
+<pre><code># Transaction begun
+Postgrex.Connection.begin(pid)
+Postgrex.Connection.query(pid, &quot;INSERT INTO comments (text) VALUES (&#39;first&#39;)&quot;)
+
+# Nested subtransaction begun
+Postgrex.Connection.begin(pid)
+Postgrex.Connection.query(pid, &quot;INSERT INTO comments (text) VALUES (&#39;second&#39;)&quot;)
+
+# Subtransaction rolled back
+Postgrex.Connection.rollback(pid)
+
+# Only the first comment will be commited because the second was rolled back
+Postgrex.Connection.commit(pid)
+</code></pre>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L136" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="begin!/2">
+    <span class="signature"><strong>begin!(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#begin!/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>begin!(pid, timeout) :: :ok | no_return</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Starts a transaction. Returns <code>:ok</code> if it was successful or raises
+<a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if an error occurred. See <code>begin/1</code>.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L149" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="commit/2">
+    <span class="signature"><strong>commit(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#commit/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>commit(pid, timeout) :: :ok | {:error, <a href="Postgrex.Error.html#t:t/0">Postgrex.Error.t</a>}</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Commits a transaction. Returns <code>:ok</code> or <code>{:error, %Postgrex.Error{}}</code> if an
+error occurred. See <code>begin/1</code> for more information.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L190" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="commit!/2">
+    <span class="signature"><strong>commit!(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#commit!/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>commit!(pid, timeout) :: :ok | no_return</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Commits a transaction. Returns <code>:ok</code> if it was successful or raises
+<a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if an error occurred. See <code>commit/1</code>.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L204" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="in_transaction/3">
+    <span class="signature"><strong>in_transaction(pid, timeout \\ :infinity, fun)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#in_transaction/3" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>in_transaction(pid, timeout, (() -> term)) :: term | no_return</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Helper for creating reliable transactions. If an error is raised in the given
+function the transaction is rolled back, otherwise it is commited. A
+transaction can be cancelled with <code>throw :postgrex_rollback</code>. If there is a
+connection error <a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> will be raised.</p>
+
+<p>NOTE:</p>
+
+<ul>
+<li>Do not use this function in conjunction with <code>begin/1</code>, <code>commit/1</code> and
+<code>rollback/1</code>.</li>
+<li> The timeout argument is not the maximum timeout of the entire call but
+rather the timeout of the <a href="#commit/2"><code>commit/2</code></a> and <a href="#rollback/2"><code>rollback/2</code></a> calls that this function
+makes.</li>
+</ul>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L228" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="parameters/2">
+    <span class="signature"><strong>parameters(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#parameters/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>parameters(pid, timeout) :: %{}</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Returns a cached map of connection parameters.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L108" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="query/4">
+    <span class="signature"><strong>query(pid, statement, params \\ [], timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#query/4" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>query(pid, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, list, timeout) :: {:ok, <a href="Postgrex.Result.html#t:t/0">Postgrex.Result.t</a>} | {:error, <a href="Postgrex.Error.html#t:t/0">Postgrex.Error.t</a>}</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Runs an (extended) query and returns the result as <code>{:ok, %Postgrex.Result{}}</code>
+or <code>{:error, %Postgrex.Error{}}</code> if there was an error. Parameters can be
+set in the query as <code>$1</code> embedded in the query string. Parameters are given as
+a list of elixir values. See the README for information on how Postgrex
+encodes and decodes elixir values by default. See <a href="Postgrex.Result.html"><code>Postgrex.Result</code></a> for the
+result data.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L81" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="query!/4">
+    <span class="signature"><strong>query!(pid, statement, params \\ [], timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#query!/4" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>query!(pid, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, list, timeout) :: <a href="Postgrex.Result.html#t:t/0">Postgrex.Result.t</a> | no_return</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Runs an (extended) query and returns the result or raises <a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if
+there was an error. See <code>query/3</code>.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L95" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="rollback/2">
+    <span class="signature"><strong>rollback(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#rollback/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>rollback(pid, timeout) :: :ok | {:error, <a href="Postgrex.Error.html#t:t/0">Postgrex.Error.t</a>}</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Rolls back a transaction. Returns <code>:ok</code> or <code>{:error, %Postgrex.Error{}}</code> if
+an error occurred. See <code>begin/1</code> for more information.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L162" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="rollback!/2">
+    <span class="signature"><strong>rollback!(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#rollback!/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>rollback!(pid, timeout) :: :ok | no_return</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Rolls back a transaction. Returns <code>:ok</code> if it was successful or raises
+<a href="Postgrex.Error.html"><code>Postgrex.Error</code></a> if an error occurred. See <code>rollback/1</code>.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L176" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="start_link/1">
+    <span class="signature"><strong>start_link(opts)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#start_link/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>start_link(<a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) :: {:ok, pid} | {:error, <a href="Postgrex.Error.html#t:t/0">Postgrex.Error.t</a> | term}</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Start the connection process and connect to postgres.</p>
+
+<h2>Options</h2>
+
+<ul>
+<li><code>:hostname</code> - Server hostname (default: PGHOST env variable, then localhost);</li>
+<li><code>:port</code> - Server port (default: 5432);</li>
+<li><code>:database</code> - Database (required);</li>
+<li><code>:username</code> - Username (default: PGUSER env variable, then USER env var);</li>
+<li><code>:password</code> - User password (default PGPASSWORD);</li>
+<li><code>:encoder</code> - Custom encoder function;</li>
+<li><code>:decoder</code> - Custom decoder function;</li>
+<li><code>:formatter</code> - Function deciding the format for a type;</li>
+<li><code>:parameters</code> - Keyword list of connection parameters;</li>
+<li><code>:connect_timeout</code> - Connect timeout in milliseconds (default: 5000);</li>
+<li><code>:ssl</code> - Set to <code>true</code> if ssl should be used (default: <code>false</code>);</li>
+<li><code>:ssl_opts</code> - A list of ssl options, see ssl docs;</li>
+</ul>
+
+<h2>Function signatures</h2>
+
+<pre><code>@spec encoder(info :: TypeInfo.t, default :: fun, param :: term) ::
+      {:binary | :text, binary}
+@spec decoder(info :: TypeInfo.t, default :: fun, bin :: binary) ::
+      term
+@spec formatter(info :: TypeInfo.t) ::
+      :binary | :text | nil
+</code></pre>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L44" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="stop/2">
+    <span class="signature"><strong>stop(pid, timeout \\ :infinity)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#stop/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+    <p>Specs:</p>
+    <ul class="spec">
+      
+        <li>stop(pid, timeout) :: :ok</li>
+      
+    </ul>
+  
+  <div class="docstring"><p>Stop the process and disconnect.</p>
+</div>
+  
+    <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/connection.ex#L66" class="view_source">Source</a>
+  
+</div>
+
+        </div>
+      
+
+      
+
+      
+    </div>
+  </body>
+</html>

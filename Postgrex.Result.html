@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Postgrex.Result</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <div id="content">
+      <div class="breadcrumbs">Postgrex v0.5.3 &rarr; <a href="overview.html">Overview</a> &rarr; Postgrex &rarr; <a href="Postgrex.Result.html">Result</a></div>
+
+      <h1>
+        Postgrex.Result
+        
+      </h1>
+
+      <ul class="summary_links">
+        
+        
+        
+        
+        
+          <li><a href="#types_details">Types</a></li>
+        
+      </ul>
+
+      
+        <div id="moduledoc" class="docstring">
+          <p>Result struct returned from any successful query. Its fields are:</p>
+
+<ul>
+<li><code>command</code> - An atom of the query command, for example: <code>:select</code> or
+            <code>:insert</code>;</li>
+<li><code>columns</code> - The column names;</li>
+<li><code>rows</code> - The result set. A list of tuples, each tuple corresponding to a
+         row, each element in the tuple corresponds to a column;</li>
+<li><code>num_rows</code> - The number of fetched or affected rows;</li>
+</ul>
+
+        </div>
+      
+
+      
+        <a href="https://github.com/ericmj/postgrex/blob/33963c3d768e3ba8d0fcce2094cb99e941414b2a
+/lib/postgrex/structs.ex#L1" class="view_source">Source</a>
+      
+
+      
+
+      
+        <div id="types_details" class="details_list">
+          <h2>Types <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></h2>
+          <div class="type_detail">
+  <p class="typespec" id="t:t/0">
+    <a href="#t:t/0">t</a> :: %Postgrex.Result{command: atom, columns: [<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>] | nil, rows: [tuple] | nil, num_rows: integer}
+  </p>
+  
+</div>
+
+        </div>
+      
+
+      
+
+      
+
+      
+    </div>
+  </body>
+</html>

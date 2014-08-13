@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>README</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <div id="content">
+      <div class="breadcrumbs">Postgrex v0.5.3 &rarr; <a href="readme.html">README</a></div>
+      <h1>Postgrex</h1>
+
+<p><a href="https://travis-ci.org/ericmj/postgrex"><img src="https://travis-ci.org/ericmj/postgrex.png?branch=master" alt="Build Status"></a></p>
+
+<p>PostgreSQL driver for Elixir.</p>
+
+<p>Documentation: <a href="http://ericmj.github.io/postgrex">http://ericmj.github.io/postgrex</a></p>
+
+<h2>Usage</h2>
+
+<p>Add Postgrex as a dependency in your <code>mix.exs</code> file.</p>
+
+<p><code>elixir
+def deps do
+  [ { :postgrex, github: &quot;ericmj/postgrex&quot; } ]
+end
+</code></p>
+
+<p>After you are done, run <code>mix deps.get</code> in your shell to fetch and compile Postgrex. Start an interactive Elixir shell with <code>iex -S mix</code>.</p>
+
+<p>```iex
+iex&gt; { :ok, pid } = Postgrex.Connection.start<em>link([hostname: &quot;localhost&quot;, username: &quot;postgres&quot;, password: &quot;postgres&quot;, database: &quot;postgres&quot;])
+{:ok, #PID<0.69.0>}
+iex&gt; Postgrex.Connection.query(pid, &quot;SELECT user</em>id, text FROM comments&quot;)
+{:ok,
+ Postgrex.Result[command: :select, empty?: false, columns: [&quot;user<em>id&quot;, &quot;text&quot;],
+  rows: [{3,&quot;hey&quot;},{4,&quot;there&quot;}], size: 2]}
+iex&gt; Postgrex.Connection.query(pid, &quot;INSERT INTO comments (user</em>id, text) VALUES (10, &#39;heya&#39;)&quot;)
+{:ok,
+ Postgrex.Result[command: :insert, columns: nil, rows: nil, num_rows: 1]}</p>
+
+<p>```</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Automatic decoding and encoding of Elixir values to and from PostgreSQL&#39;s binary format</li>
+<li>User specified custom encoders and decoders</li>
+<li>Nested transactions</li>
+<li>Supports PostgreSQL 8.4, 9.0, 9.1, 9.2 and 9.3</li>
+</ul>
+
+<h2>Data representation</h2>
+
+<pre class="codeblock"><code>PostgreSQL      Elixir
+----------      ------
+NULL            nil
+bool            true | false
+char            &quot;é&quot;
+int             42
+float           42.0
+text            &quot;eric&quot;
+bytea           &lt;&lt; 42 &gt;&gt;
+numeric         #Decimal&lt;42.0&gt; *
+date            { 2013, 10, 12 }
+time            { 0, 37, 14 }
+timestamp(tz)   { { 2013, 10, 12 }, { 0, 37, 14 } }
+interval        { 14, 40, 10920 } **
+array           [ 1, 2, 3 ]
+composite type  { 42, &quot;title&quot;, &quot;content&quot; }
+</code></pre>
+
+<p>* <a href="http://github.com/ericmj/decimal">Decimal</a></p>
+
+<p>** interval is encoded as <code>{ months, days, seconds }</code>.</p>
+
+<h2>Custom encoder and decoder example</h2>
+
+<p>Encoding and decoding from and to JSON:</p>
+
+<p>```elixir
+def decoder(TypeInfo[sender: &quot;json&quot;], _format, _default, binary) do
+  JSON.decode(binary)
+end</p>
+
+<p>def decoder(TypeInfo[], _format, default, binary) do
+  default.(binary)
+end</p>
+
+<p>def encoder(TypeInfo[sender: &quot;json&quot;], _default, value) do
+  JSON.encode(value)
+end</p>
+
+<p>def encoder(TypeInfo[], default, value) do
+  default.(value)
+end</p>
+
+<p>def formatter(TypeInfo[sender: &quot;json&quot;]) do
+  :text
+end</p>
+
+<p>def formatter(TypeInfo[]) do
+  nil
+end
+```</p>
+
+<h2>TODO</h2>
+
+<ul>
+<li>Callbacks for asynchronous events</li>
+</ul>
+
+<h2>Contributing</h2>
+
+<p>To contribute you need to compile Postgrex from source and test it:</p>
+
+<p><code>
+$ git clone https://github.com/ericmj/postgrex.git
+$ cd postgrex
+$ mix test
+</code></p>
+
+<p>The tests requires some modifications to your <a href="http://www.postgresql.org/docs/9.3/static/auth-pg-hba-conf.html">hba file</a>. The path to it can be found by running <code>$ psql -U postgres -c &quot;SHOW hba_file&quot;</code> in your shell. Put the following above all other configurations (so that they override):</p>
+
+<p><code>
+host    all             postgrex_md5_pw         127.0.0.1/32    md5
+host    all             postgrex_cleartext_pw   127.0.0.1/32    password
+</code></p>
+
+<p>The server needs to be restarted for the changes to take effect. Additionally you need to setup a Postgres user with the same username as the local user and give it trust or ident in your hba file. Or you can export $PGUSER and $PGPASS before running tests.</p>
+
+<h2>License</h2>
+
+<p>Copyright 2013 Eric Meadows-Jönsson</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at</p>
+
+<pre class="codeblock"><code>   http://www.apache.org/licenses/LICENSE-2.0
+</code></pre>
+
+<p>Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.</p>
+
+    </div>
+  </body>
+</html>
+
